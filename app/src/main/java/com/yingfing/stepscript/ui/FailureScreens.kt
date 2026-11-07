@@ -1,5 +1,6 @@
 package com.yingfing.stepscript.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,8 +31,7 @@ fun FailureListScreen(onOpen: (Long) -> Unit) {
             ListItem(
                 headlineContent = { Text("${f.scriptName} · 第 ${f.stepIndex + 1} 步") },
                 supportingContent = { Text(f.reason, maxLines = 2) },
-                modifier = androidx.compose.foundation.clickable(onClick = { onOpen(f.id) })
-                    .let { it },
+                modifier = Modifier.clickable { onOpen(f.id) },
             )
             HorizontalDivider()
         }
