@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">拾步 StepScript</string>
+    <string name="a11y_service_label">拾步 · 界面采集与自动化</string>
+    <string name="a11y_service_desc">拾步需要无障碍权限来：读取目标应用界面布局（用于展示与脚本匹配）、监听你的操作以录制脚本、以及代替你执行点击/输入等动作。所有数据仅保存在本机。</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- 一个脚印 + 步进箭头，呼应“拾步” -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M44,30c-6,0 -9,6 -9,13c0,8 4,12 4,19c0,4 -2,7 -2,10c0,4 3,6 7,6c5,0 7,-4 7,-9c0,-8 -5,-13 -5,-21c0,-5 2,-9 -2,-18z"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M63,52l12,8l-12,8l0,-5l-8,0l0,-6l8,0z"/>
+</vector>
