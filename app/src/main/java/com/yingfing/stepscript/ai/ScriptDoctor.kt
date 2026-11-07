@@ -19,9 +19,9 @@ import java.net.URL
  *  - 补丁必须用户确认才生效。
  */
 class ScriptDoctor(
-    private val baseUrl: String,   // OpenAI 兼容接口，如 https://api.xx.com/v1
-    private val apiKey: String,
-    private val model: String,
+    val baseUrl: String,   // OpenAI 兼容接口，如 https://api.xx.com/v1
+    val apiKey: String,
+    val model: String,
 ) {
 
     data class Patch(val newSource: String, val diff: List<Diff.Line>, val explanation: String)

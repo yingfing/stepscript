@@ -20,7 +20,7 @@ class StepScriptApp : Application() {
 
         // 启动内置 MCP Server（监听 127.0.0.1，电脑侧 adb reverse 接入）
         try {
-            com.yingfing.stepscript.mcp.McpServer().start(SERVER_SOCKET_READ_TIMEOUT, false)
+            com.yingfing.stepscript.mcp.McpServer().start(5_000, false)
         } catch (e: Exception) {
             android.util.Log.w("StepScript", "MCP Server 启动失败（端口被占用？）: ${e.message}")
         }

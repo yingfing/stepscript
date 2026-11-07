@@ -4,9 +4,8 @@ import android.content.pm.PackageManager
 import rikka.shizuku.Shizuku
 
 /**
- * Shizuku 封装：目前只用到一件事——失败善后时 force-stop 目标应用
- * （比"按返回/回桌面"干净，避免目标 App 留在后台继续弹东西）。
- * Shizuku 未连接时优雅降级为回桌面。
+ * Shizuku 集成（v1 仅探测可用性；force-stop 走 UserService，v1.1 实现）。
+ * 当前善后策略：回桌面 + 返回，把目标 App 退到后台。
  */
 object ShizukuSupport {
 
@@ -14,24 +13,11 @@ object ShizukuSupport {
         runCatching { Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED }
             .getOrDefault(false)
 
-    /** 尽力 force-stop；返回实际使用的善后方式描述（给失败记录看）。 */
-    fun forceStop(packageName: String): String {
-        if (isAvailable()) {
-            val exit = runCatching {
-                val process = Shizuku.newProcessBuilder()
-                    .addCommand("am", "force-stop", packageName)
-                    .start()
-                process.waitFor()
-            }.getOrDefault(-1)
-            if (exit == 0) return "已通过 Shizuku 强制停止 $packageName"
-        }
-        // 降级：回桌面 + 把目标应用退到后台
-        A11yBridge.goHome()
-        return "Shizuku 不可用，已回桌面并结束前台（可在系统设置里授权 Shizuku 获得更干净的退出）"
+    /** 善后：返回实际使用的退场方式描述（写进失败记录）。 */
+    fun cleanup(): String {
+        val svc = com.yingfing.stepscript.access.A11y.service
+        svc?.goBack()
+        svc?.goHome()
+        return "已静默退场（回桌面）" + if (isAvailable()) "；Shizuku 已连接，force-stop 将在 v1.1 接入" else ""
     }
-}
-
-/** 避免包循环依赖的桥：把无障碍的全局动作暴露给 Shizuku 层。 */
-object A11yBridge {
-    fun goHome() = com.yingfing.stepscript.access.A11y.service?.goHome()
 }

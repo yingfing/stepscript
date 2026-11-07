@@ -59,8 +59,7 @@ class PlaybackEngine(
                     layoutXml = NodeDumper.toXml(layoutRoot),
                 )
                 onRecordFailure(ctx)
-                val pkg = lastPackage ?: "当前应用"
-                val cleanup = ShizukuSupport.forceStop(pkg)
+                val cleanup = ShizukuSupport.cleanup()
                 notify("拾步 · 脚本失败", "$outcome（第 ${i + 1} 步：${Renderer.renderStep(step)}）$cleanup")
                 onProgress(Progress(i, actions.size, step, done = false, failed = true))
                 return false
@@ -207,10 +206,9 @@ class PlaybackEngine(
 
     /** ③ 弹窗校验：前台是否挂着对话框窗口。 */
     private fun hasDialogWindow(): Boolean =
-        A11y.service?.windows?.any { it.type == android.view.WindowType.TYPE_APPLICATION } == true &&
-            A11y.service!!.windows.any {
-                it.root?.className?.toString()?.contains("Dialog", ignoreCase = true) == true
-            }
+        A11y.service?.windows?.any {
+            it.isActive && it.root?.className?.toString()?.contains("Dialog", ignoreCase = true) == true
+        } == true
 
     /** ④ 结果校验：粗粒度界面指纹，点击前后完全一致视为"点了没反应"。 */
     private fun pageFingerprint(): String {

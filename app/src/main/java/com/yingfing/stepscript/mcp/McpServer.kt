@@ -219,7 +219,7 @@ class McpServer(private val port: Int = DEFAULT_PORT) : NanoHTTPD("127.0.0.1", p
                     ?: return@runBlocking "找不到失败记录"
                 val script = app.db.scripts.getById(f.scriptId)
                     ?: return@runBlocking "原脚本已被删除"
-                val prefs = app.prefs
+                val prefs = StepScriptApp.prefs
                 val doctor = ScriptDoctor(
                     baseUrl = prefs.getString("baseUrl", "") ?: "",
                     apiKey = prefs.getString("apiKey", "") ?: "",
