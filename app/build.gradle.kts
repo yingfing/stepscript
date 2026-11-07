@@ -52,4 +52,7 @@ dependencies {
 
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
+
+    // 内置 MCP Server 的本地 HTTP 库（~50KB）
+    implementation("org.nanohttpd:nanohttpd:2.3.1")
 }

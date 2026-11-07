@@ -39,6 +39,27 @@ cd stepscript
 2. （可选）安装 [Shizuku](https://shizuku.rikka.app/) 并授权，失败善后时才能 force-stop 目标应用；不装也能用（降级为回桌面）
 3. 在「设置」里填 AI 接口（可以先用任何 OpenAI 兼容服务；本地 Ollama 填 `http://<电脑IP>:11434/v1`）
 
+## MCP：让任何 AI 接管这台手机上的拾步
+
+App 启动时会在 **127.0.0.1:8765** 起一个 MCP Server（Streamable HTTP / JSON-RPC 2.0）。
+
+电脑侧接入（两步）：
+
+```bash
+adb reverse tcp:8765 tcp:8765
+# 然后 MCP 客户端（Claude Desktop / 任何支持 MCP 的 AI）连接 http://127.0.0.1:8765/mcp
+```
+
+暴露的工具覆盖"用户能做的一切"：
+
+| 类别 | 工具 |
+|---|---|
+| 脚本 | `list_scripts` `get_script` `write_script`（写入前强制语法校验，AI 写错直接打回）`run_script` |
+| 界面 | `get_layout`（压缩文本+XML）`tap_element` `input_text` `press` `swipe` |
+| 失败 | `list_failures` `get_failure` `ai_fix_failure`（AI 出补丁 diff，**不自动落库**） |
+
+安全红线不变：AI 不直接获得危险操作权——写脚本必须过语法校验，AI 补丁只返回 diff，落库必须显式调 `write_script`；MCP 只监听本机回环，外部无法访问。
+
 ## 已知边界（诚实清单）
 
 - 截图通道 v1 为占位（`PlaybackEngine` 的 `screenshot`），实机落盘需要 MediaProjection/ImageReader，下一版接上
