@@ -161,8 +161,11 @@ class PlaybackEngine(
                     }
                     return "等待弹窗超时（${step.timeoutSec}s）"
                 }
-                val found = findWithWait(step.selectorType!!, step.value!!, timeoutMs = step.timeoutSec * 1000L)
-                return if (found != null) null else "等待控件超时：${describe(step.selectorType, step.value)}"
+                val t = step.selectorType
+                val v = step.value
+                if (t == null || v == null) return "等待语句缺少定位条件"
+                val found = findWithWait(t, v, timeoutMs = step.timeoutSec * 1000L)
+                return if (found != null) null else "等待控件超时：${describe(t, v)}"
             }
 
             is Step.Assert -> {
