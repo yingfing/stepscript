@@ -21,6 +21,8 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // DIY 项目：release 直接用 debug 签名，保证打出的 APK 可直接安装
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
