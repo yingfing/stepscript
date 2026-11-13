@@ -25,12 +25,14 @@ object Screenshot {
         val result = suspendCancellableCoroutine<AccessibilityService.ScreenshotResult?> { cont ->
             runCatching {
                 svc.takeScreenshot(
-                    Display.DEFAULT_DISPLAY,
-                    android.content.Context.MAIN_EXECUTOR,
+                    svc.display?.displayId ?: Display.DEFAULT_DISPLAY,
+                    svc.mainExecutor,
                     object : AccessibilityService.TakeScreenshotCallback {
-                        override fun onWillTakeScreenshot() {}
-                        override fun onScreenshotTaken(r: AccessibilityService.ScreenshotResult?) {
+                        override fun onSuccess(r: AccessibilityService.ScreenshotResult) {
                             cont.resume(r)
+                        }
+                        override fun onFailure(errorCode: Int) {
+                            cont.resume(null)
                         }
                     },
                 )

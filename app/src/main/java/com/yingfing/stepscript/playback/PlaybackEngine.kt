@@ -22,7 +22,7 @@ import kotlinx.coroutines.delay
  * 全局「兜底」规则优先于直接失败：文本命中 → 跳过；任意弹窗 → 关闭再重试。
  */
 class PlaybackEngine(
-    private val screenshot: () -> String?,                       // 返回截图文件路径
+    private val screenshot: suspend () -> String?,                // 返回截图文件路径
     private val notify: (title: String, text: String) -> Unit,   // 发通知
     private val onRecordFailure: suspend (FailureContext) -> Unit,
 ) {
