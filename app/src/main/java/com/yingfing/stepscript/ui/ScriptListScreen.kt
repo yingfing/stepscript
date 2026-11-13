@@ -85,28 +85,6 @@ fun ScriptListScreen(
 }
 
 private suspend fun runScript(s: ScriptEntity, snackbar: SnackbarHostState) {
-    val script = try {
-        com.yingfing.stepscript.core.Parser.parse(s.source)
-    } catch (e: com.yingfing.stepscript.core.ScriptParseException) {
-        snackbar.showSnackbar("脚本语法有误：${e.message}")
-        return
-    }
-    val engine = PlaybackEngine(
-        screenshot = { null }, // v1 截图通道见 README：需要 ImageReader 落盘，占位
-        notify = { _, _ -> },
-        onRecordFailure = { ctx ->
-            StepScriptApp.db.failures.insert(
-                com.yingfing.stepscript.data.FailureEntity(
-                    scriptId = s.id, scriptName = s.name,
-                    stepIndex = ctx.stepIndex,
-                    stepText = com.yingfing.stepscript.core.Renderer.renderStep(ctx.step),
-                    reason = ctx.reason,
-                    screenshotPath = ctx.screenshotPath,
-                    layoutText = ctx.layoutText, layoutXml = ctx.layoutXml,
-                )
-            )
-        },
-    )
-    val ok = engine.run(script) { }
-    snackbar.showSnackbar(if (ok) "「${s.name}」执行完成" else "「${s.name}」执行失败，已留证，去「失败记录」处理")
+    val r = com.yingfing.stepscript.playback.PlaybackRunner.run(s)
+    snackbar.showSnackbar(r.message)
 }

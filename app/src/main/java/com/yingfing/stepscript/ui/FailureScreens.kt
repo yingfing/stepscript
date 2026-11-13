@@ -104,6 +104,7 @@ fun FailureDetailScreen(failureId: Long, onBack: () -> Unit) {
                     DiffView(patch!!.diff)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(onClick = {
+                            diagnosing = true
                             scope.launch {
                                 // 打补丁 + 存版本历史
                                 StepScriptApp.db.versions.insert(
@@ -115,10 +116,37 @@ fun FailureDetailScreen(failureId: Long, onBack: () -> Unit) {
                                 )
                                 StepScriptApp.db.scripts.updateSource(failure.scriptId, patch!!.newSource)
                                 StepScriptApp.db.failures.markResolved(failureId)
-                                snackbar.showSnackbar("补丁已应用")
+                                // 采纳后自动重跑验证：修没修好，跑一遍就知道
+                                val script = StepScriptApp.db.scripts.getById(failure.scriptId)
+                                val r = script?.let {
+                                    com.yingfing.stepscript.playback.PlaybackRunner.run(it, runBy = "补丁重跑")
+                                }
+                                snackbar.showSnackbar(
+                                    when {
+                                        r == null -> "补丁已应用（原脚本已删除，未重跑）"
+                                        r.ok -> "✅ 补丁已应用，重跑验证通过"
+                                        else -> "补丁已应用，但重跑仍失败，已生成新的失败记录 #${r.failureId}"
+                                    }
+                                )
+                                diagnosing = false
                                 onBack()
                             }
-                        }) { Text("采纳补丁") }
+                        }) { Text(if (diagnosing) "应用并重跑…" else "采纳并重跑") }
+                        OutlinedButton(onClick = {
+                            scope.launch {
+                                StepScriptApp.db.versions.insert(
+                                    com.yingfing.stepscript.data.ScriptVersionEntity(
+                                        scriptId = failure.scriptId,
+                                        source = patch!!.newSource,
+                                        comment = "AI 补丁：${patch!!.explanation}",
+                                    )
+                                )
+                                StepScriptApp.db.scripts.updateSource(failure.scriptId, patch!!.newSource)
+                                StepScriptApp.db.failures.markResolved(failureId)
+                                snackbar.showSnackbar("补丁已应用（未重跑）")
+                                onBack()
+                            }
+                        }) { Text("仅采纳") }
                         OutlinedButton(onClick = { patch = null }) { Text("拒绝") }
                     }
                 }

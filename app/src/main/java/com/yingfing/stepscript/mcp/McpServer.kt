@@ -146,25 +146,11 @@ class McpServer(private val port: Int = DEFAULT_PORT) : NanoHTTPD("127.0.0.1", p
             }
 
             "run_script" -> runBlocking {
-                val s = app.db.scripts.getById(args.getLong("scriptId"))
+                val s = StepScriptApp.db.scripts.getById(args.getLong("scriptId"))
                     ?: return@runBlocking "找不到脚本 ${args.opt("scriptId")}"
-                val script = try { Parser.parse(s.source) } catch (e: ScriptParseException) {
-                    return@runBlocking "脚本语法有误：${e.message}"
-                }
-                val engine = PlaybackEngine(
-                    screenshot = { null },
-                    notify = { _, _ -> },
-                    onRecordFailure = { ctx ->
-                        app.db.failures.insert(FailureEntity(
-                            scriptId = s.id, scriptName = s.name, stepIndex = ctx.stepIndex,
-                            stepText = Renderer.renderStep(ctx.step), reason = ctx.reason,
-                            screenshotPath = ctx.screenshotPath,
-                            layoutText = ctx.layoutText, layoutXml = ctx.layoutXml))
-                    },
-                )
-                val ok = engine.run(script) { }
-                if (ok) "✅ 「${s.name}」执行完成"
-                else "❌ 执行失败，已留证（用 list_failures / get_failure 查看现场）"
+                val r = com.yingfing.stepscript.playback.PlaybackRunner.run(s, runBy = "MCP")
+                if (r.ok) r.message
+                else r.message + "（用 list_failures / get_failure 查看现场）"
             }
 
             "get_layout" -> {

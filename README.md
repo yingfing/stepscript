@@ -62,9 +62,11 @@ adb reverse tcp:8765 tcp:8765
 
 ## 已知边界（诚实清单）
 
-- 截图通道 v1 为占位（`PlaybackEngine` 的 `screenshot`），实机落盘需要 MediaProjection/ImageReader，下一版接上
+- 截图已接入无障碍 `takeScreenshot`（Android 11+ 自动生效；Android 10 及以下失败现场暂无截图，只有布局快照）
 - 输入框逐字输入的 IME 通道未实现，依赖 `ACTION_SET_TEXT`（绝大多数场景够用）
 - 反自动化检测的银行类应用无法支持（会检测无障碍），这是平台限制
+- Shizuku force-stop 尚未接入（v1.1 计划），失败善后目前为"返回 + 回桌面"
+- AI 补丁采纳后支持自动重跑验证（"采纳并重跑"），Android 13+ 需要授予通知权限才能收到失败通知
 
 ## License
 
